@@ -2,6 +2,7 @@
 from bidict import bidict 
 from get_category_list_from_file import get_category_list_from_file 
 from pprint import pprint 
+from tqdm import tqdm 
 
 def _id_to_color_str(id: int) -> str:
   return f"({id}, {id}, {id})"
@@ -29,6 +30,8 @@ def write_coco_json_from_segmentation_path(image_orig_dir_path: str, image_mask_
   limit               : How many images to convert + write. If None, does all. 
   """
   
+  _get_confirmation_from_user_about_overwrite(json_write_path)
+  
   # If category ID is list, then enumerate and return map from name to ID. 
   if isinstance(category_id_map, list):
     category_id_map = bidict({ category_name : i for i, category_name in enumerate(category_id_map) })
@@ -45,7 +48,22 @@ def write_coco_json_from_segmentation_path(image_orig_dir_path: str, image_mask_
   
   pprint(f"json dumps: {json.dumps(coco_format)}", indent=2)
   
-  # with open(f"
+  with open(json_write_path, "w") as outfile:
+    json.dump(coco_format, outfile, indent=2)
+
+def _get_confirmation_from_user_about_overwrite(json_write_path):
+  """ Returns if user wants to overwrite. Otherwise, raises SystemExit. """
+  if os.path.exists(json_write_path):
+      while True:
+          inp = input(f"\033[91m{json_write_path} already exists. Overwrite? (y/n)\033[0m ")
+          if inp.lower() in ["n", "no"]:
+              print("Raising SystemExit.")
+              raise SystemExit()
+          elif inp.lower() in ["y", "yes"]:
+              print("Overwriting.")
+              return 
+          else:
+              print("Invalid input. Please enter y/n.")
 
 # SOURCE: https://github.com/chrise96/image-to-coco-json-converter/blob/master/create-custom-coco-dataset.ipynb 
 
@@ -212,7 +230,7 @@ def images_annotations_info(maskpath, category_colors, limit=None):
     if limit is not None:
       files_to_iter = files_to_iter[:limit]
     
-    for mask_image in files_to_iter:
+    for mask_image in tqdm(files_to_iter, desc=f"Creating annotations for {maskpath}."):
         # The mask image is *.png but the original image is *.jpg.
         # We make a reference to the original file in the COCO JSON file
         original_file_name = os.path.basename(mask_image).split(".")[0] + ".jpg"
