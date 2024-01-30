@@ -1,6 +1,6 @@
 
 from bidict import bidict 
-from get_category_list_from_file import get_category_list_from_file 
+from .get_category_list_from_file import get_category_list_from_file 
 from pprint import pprint 
 from tqdm import tqdm 
 
