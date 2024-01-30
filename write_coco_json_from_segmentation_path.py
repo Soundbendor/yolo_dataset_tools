@@ -274,22 +274,4 @@ def images_annotations_info(maskpath, category_colors, limit=None):
 if __name__ == "__main__":
   main()
 
-if __name__ != "__main__":
-    # Get the standard COCO JSON format
-    coco_format = get_coco_json_format()
-    
-    for keyword in ["train", "val"]:
-        mask_path = "dataset/{}_mask/".format(keyword)
-        
-        # Create category section
-        coco_format["categories"] = create_category_annotation(category_ids)
-    
-        # Create images and annotations sections
-        coco_format["images"], coco_format["annotations"], annotation_cnt = images_annotations_info(mask_path)
-
-        with open("output/{}.json".format(keyword),"w") as outfile:
-            json.dump(coco_format, outfile)
-        
-        print("Created %d annotations for images in folder: %s" % (annotation_cnt, mask_path))
-
 # # # END OF create-custom-coco-dateset.ipynb IN ORIGINAL REPO. 
