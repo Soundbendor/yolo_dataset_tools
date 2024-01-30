@@ -7,8 +7,8 @@ def _id_to_color_str(id: int) -> str:
   return f"({id}, {id}, {id})"
 
 def main():
-  FOOD_SEG_103_TEST_ORIG_IMAGES_PATH  = "/home/joey/food-waste-model-training/datasets/datasets/Food_Seg_103/FoodSeg103/Test/images"
-  FOOD_SEG_103_TEST_LABEL_IMAGES_PATH = "/home/joey/food-waste-model-training/datasets/datasets/Food_Seg_103/FoodSeg103/Test/labels_images"
+  FOOD_SEG_103_TEST_ORIG_IMAGES_PATH  = "/home/joey/food-waste-model-training/datasets/datasets/Food_Seg_103/FoodSeg103/Test/images/"
+  FOOD_SEG_103_TEST_LABEL_IMAGES_PATH = "/home/joey/food-waste-model-training/datasets/datasets/Food_Seg_103/FoodSeg103/Test/labels_images/"
   FOOD_SEG_103_JSON_WRITE_PATH        = "test_json_write_path.json"
   FOOD_SEG_103_CATEGORY_ID_MAP        = get_category_list_from_file("/home/joey/food-waste-model-training/datasets/datasets/Food_Seg_103/FoodSeg103/category_id.txt", start_line=0)
   LIMIT                               = 32 
@@ -34,16 +34,18 @@ def write_coco_json_from_segmentation_path(image_orig_dir_path: str, image_mask_
     category_id_map = bidict({ category_name : i for i, category_name in enumerate(category_id_map) })
     
   # Get the colors for the category names. 
-  category_colors = { category_name : _id_to_color_str(category_id) for (category_name, category_id) in category_id_map.items() }
+  category_colors = { _id_to_color_str(category_id): category_id for (category_name, category_id) in category_id_map.items() }
 
   # Getting empty COCO json. 
   coco_format = get_coco_json_format()
 
   coco_format["categories"] = create_category_annotation(category_id_map)
   
-  coco_format["images"], coco_format["annotations"], annotation_cnt = images_annotations_info(image_mask_dir_path, limit=limit)
+  coco_format["images"], coco_format["annotations"], annotation_cnt = images_annotations_info(image_mask_dir_path, category_colors, limit=limit)
   
   pprint(f"json dumps: {json.dumps(coco_format)}", indent=2)
+  
+  # with open(f"
 
 # SOURCE: https://github.com/chrise96/image-to-coco-json-converter/blob/master/create-custom-coco-dataset.ipynb 
 
@@ -170,36 +172,36 @@ def get_coco_json_format():
 import glob
 
 # Label ids of the dataset
-category_ids = {
-    "outlier": 0,
-    "window": 1,
-    "wall": 2,
-    "balcony": 3,
-    "door": 4,
-    "roof": 5,
-    "sky": 6,
-    "shop": 7,
-    "chimney": 8
-}
+# category_ids = {
+#     "outlier": 0,
+#     "window": 1,
+#     "wall": 2,
+#     "balcony": 3,
+#     "door": 4,
+#     "roof": 5,
+#     "sky": 6,
+#     "shop": 7,
+#     "chimney": 8
+# }
 
 # Define which colors match which categories in the images
-category_colors = {
-    "(0, 0, 0)": 0, # Outlier
-    "(255, 0, 0)": 1, # Window
-    "(255, 255, 0)": 2, # Wall
-    "(128, 0, 255)": 3, # Balcony
-    "(255, 128, 0)": 4, # Door
-    "(0, 0, 255)": 5, # Roof
-    "(128, 255, 255)": 6, # Sky
-    "(0, 255, 0)": 7, # Shop
-    "(128, 128, 128)": 8 # Chimney
-}
+# category_colors = {
+#     "(0, 0, 0)": 0, # Outlier
+#     "(255, 0, 0)": 1, # Window
+#     "(255, 255, 0)": 2, # Wall
+#     "(128, 0, 255)": 3, # Balcony
+#     "(255, 128, 0)": 4, # Door
+#     "(0, 0, 255)": 5, # Roof
+#     "(128, 255, 255)": 6, # Sky
+#     "(0, 255, 0)": 7, # Shop
+#     "(128, 128, 128)": 8 # Chimney
+# }
 
 # Define the ids that are a multiplolygon. In our case: wall, roof and sky
 multipolygon_ids = [2, 5, 6]
 
 # Get "images" and "annotations" info 
-def images_annotations_info(maskpath, limit=None):
+def images_annotations_info(maskpath, category_colors, limit=None):
     # This id will be automatically increased as we go
     annotation_id = 0
     image_id = 0
