@@ -1,4 +1,0 @@
-
-Install with: 
-`python -m pip install -e PATH_TO_YOLO_DATSET_TOOLS`
-**NOTE THE `-e`. It is necessary to be able to import functions.** 
