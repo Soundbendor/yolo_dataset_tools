@@ -4,23 +4,6 @@ from get_category_list_from_file import get_category_list_from_file
 from pprint import pprint 
 from tqdm import tqdm 
 
-def _id_to_color_str(id: int) -> str:
-  return f"({id}, {id}, {id})"
-
-def main():
-  FOOD_SEG_103_TEST_ORIG_IMAGES_PATH  = "/home/joey/food-waste-model-training/datasets/datasets/Food_Seg_103/FoodSeg103/Test/images/"
-  FOOD_SEG_103_TEST_LABEL_IMAGES_PATH = "/home/joey/food-waste-model-training/datasets/datasets/Food_Seg_103/FoodSeg103/Test/labels_images/"
-  FOOD_SEG_103_JSON_WRITE_PATH        = "test_json_write_path.json"
-  FOOD_SEG_103_CATEGORY_ID_MAP        = get_category_list_from_file("/home/joey/food-waste-model-training/datasets/datasets/Food_Seg_103/FoodSeg103/category_id.txt", start_line=0)
-  LIMIT                               = 32 
-  write_coco_json_from_segmentation_path(
-    FOOD_SEG_103_TEST_ORIG_IMAGES_PATH,
-    FOOD_SEG_103_TEST_LABEL_IMAGES_PATH,
-    FOOD_SEG_103_JSON_WRITE_PATH,
-    FOOD_SEG_103_CATEGORY_ID_MAP,
-    LIMIT,
-  )
-
 def write_coco_json_from_segmentation_path(image_orig_dir_path: str, image_mask_dir_path: str, json_write_path: str, category_id_map: dict | list, limit: int | None=None):
   """
   image_orig_dir_path : Path to directory of original images. 
@@ -50,6 +33,23 @@ def write_coco_json_from_segmentation_path(image_orig_dir_path: str, image_mask_
   
   with open(json_write_path, "w") as outfile:
     json.dump(coco_format, outfile, indent=2)
+
+def _id_to_color_str(id: int) -> str:
+  return f"({id}, {id}, {id})"
+
+def main():
+  FOOD_SEG_103_TEST_ORIG_IMAGES_PATH  = "/home/joey/food-waste-model-training/datasets/datasets/Food_Seg_103/FoodSeg103/Test/images/"
+  FOOD_SEG_103_TEST_LABEL_IMAGES_PATH = "/home/joey/food-waste-model-training/datasets/datasets/Food_Seg_103/FoodSeg103/Test/labels_images/"
+  FOOD_SEG_103_JSON_WRITE_PATH        = "test_json_write_path.json"
+  FOOD_SEG_103_CATEGORY_ID_MAP        = get_category_list_from_file("/home/joey/food-waste-model-training/datasets/datasets/Food_Seg_103/FoodSeg103/category_id.txt", start_line=0)
+  LIMIT                               = 32 
+  write_coco_json_from_segmentation_path(
+    FOOD_SEG_103_TEST_ORIG_IMAGES_PATH,
+    FOOD_SEG_103_TEST_LABEL_IMAGES_PATH,
+    FOOD_SEG_103_JSON_WRITE_PATH,
+    FOOD_SEG_103_CATEGORY_ID_MAP,
+    LIMIT,
+  )
 
 def _get_confirmation_from_user_about_overwrite(json_write_path):
   """ Returns if user wants to overwrite. Otherwise, raises SystemExit. """
