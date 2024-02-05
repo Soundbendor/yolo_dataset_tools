@@ -4,7 +4,7 @@ from .get_category_list_from_file import get_category_list_from_file
 from pprint import pprint 
 from tqdm import tqdm 
 
-def write_coco_json_from_segmentation_path(image_orig_dir_path: str, image_mask_dir_path: str, json_write_path: str, category_id_map: dict | list, limit: int | None=None):
+def write_coco_json_from_segmentation_path(image_orig_dir_path: str, image_mask_dir_path: str, json_write_path: str, category_id_map: dict | list, limit: int | None=None, verbose: bool=False):
   """
   image_orig_dir_path : Path to directory of original images. 
   image_mask_dir_path : Path to directory of segmentation mask images. 
@@ -29,8 +29,15 @@ def write_coco_json_from_segmentation_path(image_orig_dir_path: str, image_mask_
   
   coco_format["images"], coco_format["annotations"], annotation_cnt = images_annotations_info(image_mask_dir_path, category_colors, limit=limit)
   
-  pprint(f"json dumps: {json.dumps(coco_format)}", indent=2)
-  
+  if verbose:
+    pprint(f"json dumps: {json.dumps(coco_format)}", indent=2)
+  try:
+    if not os.path.exists(os.path.dirname(json_write_path)):
+      os.makedirs(os.path.dirname(json_write_path))
+  except Exception as e:
+    print(f"\033[91mPath must be absolute path, found {json_write_path}\033[0m")
+    print(f"\033[91mError: {e}\033[0m")
+    raise e
   with open(json_write_path, "w") as outfile:
     json.dump(coco_format, outfile, indent=2)
 
