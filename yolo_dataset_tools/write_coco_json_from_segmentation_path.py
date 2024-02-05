@@ -4,13 +4,16 @@ from .get_category_list_from_file import get_category_list_from_file
 from pprint import pprint 
 from tqdm import tqdm 
 
-def write_coco_json_from_segmentation_path(image_orig_dir_path: str, image_mask_dir_path: str, json_write_path: str, category_id_map: dict | list, limit: int | None=None, verbose: bool=False, *, ask_overwrite=True):
+def write_coco_json_from_segmentation_path(image_orig_dir_path: str, image_mask_dir_path: str, json_write_path: str, category_id_map: dict | list, limit: int | None=None, verbose: bool=False, *, ask_overwrite=True, print_progress="tqdm"):
   """
   image_orig_dir_path : Path to directory of original images. 
   image_mask_dir_path : Path to directory of segmentation mask images. 
   json_write_path     : Path to write JSON to. 
   category_id_map     : { "category_name_0" : category_id0, ... }. If list provided, enumerates + inverts to get dictionary. 
   limit               : How many images to convert + write. If None, does all. 
+  
+  ask_overwrite       : Ask user y/n if json_write_path already contains a file. True (i.e., does ask user) by default. 
+  print_progress      : "tqdm" | "print" | None. "tqdm" by default. Use "print" if terminal doesn't support tqdm, or None for no output. 
   """
   
   try:
@@ -36,7 +39,7 @@ def write_coco_json_from_segmentation_path(image_orig_dir_path: str, image_mask_
 
   coco_format["categories"] = create_category_annotation(category_id_map)
   
-  coco_format["images"], coco_format["annotations"], annotation_cnt = images_annotations_info(image_mask_dir_path, category_colors, limit=limit)
+  coco_format["images"], coco_format["annotations"], annotation_cnt = images_annotations_info(image_mask_dir_path, category_colors, limit=limit, print_progress=print_progress)
   
   if verbose:
     pprint(f"json dumps: {json.dumps(coco_format)}", indent=2)
@@ -54,6 +57,7 @@ def main():
   FOOD_SEG_103_CATEGORY_ID_MAP        = get_category_list_from_file("/home/joey/food-waste-model-training/datasets/datasets/Food_Seg_103/FoodSeg103/category_id.txt", start_line=0)
   LIMIT                               = 32 
   ASK_OVERWRITE                       = False 
+  PRINT_PROGRESS                      = "print" 
   write_coco_json_from_segmentation_path(
     FOOD_SEG_103_TEST_ORIG_IMAGES_PATH,
     FOOD_SEG_103_TEST_LABEL_IMAGES_PATH,
@@ -61,6 +65,7 @@ def main():
     FOOD_SEG_103_CATEGORY_ID_MAP,
     LIMIT,
     ask_overwrite=ASK_OVERWRITE,
+    print_progress=PRINT_PROGRESS,
   )
 
 def _get_confirmation_from_user_about_overwrite(json_write_path):
@@ -231,7 +236,7 @@ import glob
 multipolygon_ids = [2, 5, 6]
 
 # Get "images" and "annotations" info 
-def images_annotations_info(maskpath, category_colors, limit=None):
+def images_annotations_info(maskpath, category_colors, limit=None, print_progress="tqdm"):
     # This id will be automatically increased as we go
     annotation_id = 0
     image_id = 0
@@ -242,7 +247,14 @@ def images_annotations_info(maskpath, category_colors, limit=None):
     if limit is not None:
       files_to_iter = files_to_iter[:limit]
     
-    for mask_image in tqdm(files_to_iter, desc=f"Creating annotations for {maskpath}."):
+    if print_progress == "tqdm":
+      files_to_iter = tqdm(files_to_iter, desc=f"Creating annotations for path {maskpath}.")
+
+    for (i, mask_image) in enumerate(files_to_iter):
+        if print_progress == "tqdm":
+          files_to_iter.set_description(f"Creating annotations for {mask_image}.")
+        elif print_progress == "print":
+          print(f"[{i}/{len(files_to_iter)} Creating annotations for {mask_image}.")
         # The mask image is *.png but the original image is *.jpg.
         # We make a reference to the original file in the COCO JSON file
         original_file_name = os.path.basename(mask_image).split(".")[0] + ".jpg"
