@@ -25,7 +25,12 @@ def write_coco_json_from_segmentation_path(image_orig_dir_path: str, image_mask_
     raise e
   
   if ask_overwrite:
-    _get_confirmation_from_user_about_overwrite(json_write_path)
+    should_overwrite = _get_confirmation_from_user_about_overwrite(json_write_path)
+    if not should_overwrite:
+      print(f"\033[91mSkipping. NOT overwriting JSON {json_write_path}.\033[0m")
+      return
+    else:
+      print(f"\033[91mOverwriting JSON {json_write_path}.\033[0m")
   
   # If category ID is list, then enumerate and return map from name to ID. 
   if isinstance(category_id_map, list):
@@ -56,7 +61,7 @@ def main():
   FOOD_SEG_103_JSON_WRITE_PATH        = "/home/joey/food-waste-model-training/datasets/datasets/Food_Seg_103/FoodSeg103/Test/coco_json/test_json_write_path.json"
   FOOD_SEG_103_CATEGORY_ID_MAP        = get_category_list_from_file("/home/joey/food-waste-model-training/datasets/datasets/Food_Seg_103/FoodSeg103/category_id.txt", start_line=0)
   LIMIT                               = 32 
-  ASK_OVERWRITE                       = False 
+  ASK_OVERWRITE                       = True 
   PRINT_PROGRESS                      = "print" 
   write_coco_json_from_segmentation_path(
     FOOD_SEG_103_TEST_ORIG_IMAGES_PATH,
@@ -68,17 +73,15 @@ def main():
     print_progress=PRINT_PROGRESS,
   )
 
-def _get_confirmation_from_user_about_overwrite(json_write_path):
-  """ Returns if user wants to overwrite. Otherwise, raises SystemExit. """
+def _get_confirmation_from_user_about_overwrite(json_write_path) -> bool:
+  """ Returns whether user wants to overwrite. """
   if os.path.exists(json_write_path):
       while True:
           inp = input(f"\033[91m{json_write_path} already exists. Overwrite? (y/n)\033[0m ")
           if inp.lower() in ["n", "no"]:
-              print("Raising SystemExit.")
-              raise SystemExit()
+              return False 
           elif inp.lower() in ["y", "yes"]:
-              print("Overwriting.")
-              return 
+              return True 
           else:
               print("Invalid input. Please enter y/n.")
 
