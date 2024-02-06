@@ -6,14 +6,23 @@
 **From local clone**:
 `python -m pip install -U PATH_TO_YOLO_DATASET_TOOLS`
 
-### Functions 
-Converts segmentation *images* => COCO JSON => YOLO segmentation format. (And, parses category list from file.) 
+### Interface files 
+`dataset_merger.pyi`
+`dataset.pyi`
+`image.pyi`
+`annotation.pyi`
 
-| Function | Description | 
+### Functions 
+1. Converts segmentation *images* => COCO JSON => YOLO segmentation format. (And, parses category list from file.) 
+2. Merges YOLO segmentation datasets by writing to new folder + storing metadata as JSON. 
+
+| Function/class | Description | 
 | --- | --- | 
 | `get_category_list_from_file` | Parse list of category names from file. | 
 | `write_coco_json_from_segmentation_path` | Converts segmentation image masks to segmentation lists, storing them in COCO JSON format. 
 | `write_image_annotations_to_folder` | COCO JSON => YOLO segmentation format. 
+| `DatasetMerger` | Merge datasets. 
+| `Dataset` | Access dataset items. 
 
 Each has a **doc string** and **examples**. (See `main()` or `__main__` for examples.)
 
