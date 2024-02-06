@@ -1,6 +1,7 @@
 
 from .dataset import Dataset 
 import bidict, json, os 
+from typing import Iterable 
 
 """
 DatasetMerger: 
@@ -71,6 +72,18 @@ class DatasetMerger:
     for secondary in secondary_list:
       if overwrite or (secondary not in self.category_secondary_to_primary_reductions):
         self.category_secondary_to_primary_reductions[secondary] = primary
+
+  def freqs(self, partition="all") -> dict:
+    dct = defaultdict(int)
+    for dataset in self.datasets:
+      for (name, freq) in dataset.freqs(partition):
+        dct[name] += freq
+    return dct
+    
+  @property
+  def datasets(self) -> Iterable[Dataset]:
+    for (name, yaml_path) in self.datasets.items():
+      yield Dataset(name, yaml_path)
       
   @property
   def reduced_global_name_to_id_dict(self) -> bidict[CategoryName, ReducedCategoryId]:

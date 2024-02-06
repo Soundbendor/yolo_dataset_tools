@@ -1,5 +1,6 @@
 
 import yaml, bidict, os, glob 
+from collections import defaultdict 
 
 class Dataset:
   def __init__(self, name, yaml_path):
@@ -24,6 +25,20 @@ class Dataset:
     for partition in partitions:
       if partition in self.yaml_dict:
         self._write_partition(write_folder, global_category_name_to_id_dict, partition, overwrite=overwrite)
+
+  def freqs(self, partition="all") -> dict:
+    """ Returns frequencies of each category name. If partition="all", sums partitions. """
+    if partition == "all":
+      partition_list = ["train", "test", "val"]
+    else:
+      partition_list = [partition]
+
+    dct = defaultdict(int)
+    for partition in partition_list:
+      for image in self.images(partition):
+        for annotation in image.annotation_list:
+          dct[annotation.category] += 1
+    return dct
         
   def _write_partition(self, write_folder, global_category_name_to_id_dict, partition, *, overwrite=False) -> bool:
     self._init_partition_folders(write_folder, partition)
