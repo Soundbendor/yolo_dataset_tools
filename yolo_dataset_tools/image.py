@@ -3,15 +3,13 @@ import os
 from .annotation import Annotation 
 from shutil import copyfile
 
-class Image:
-  def __init__(self, image_abs_path, annotation_abs_path, category_id_to_name_dict):
-    self._image_abs_path = image_abs_path
-    self._annotation_abs_path = annotation_abs_path
-    self._category_id_to_name_dict = category_id_to_name_dict # Local dataset mapping. 
+def _convert_image_path_to_label_path(image_path) -> str:
+  return "labels".join(image_path.rsplit("images", 1)) # Replaces last instance of "images" in path with "labels".
 
-  @property
-  def annotation_list(self) -> list[Annotation]:
-    return Annotation.from_path(self._annotation_abs_path, self._category_id_to_name_dict)
+class Image:
+  def __init__(self, image_abs_path, category_id_to_name_dict):
+    self._image_abs_path = image_abs_path
+    self._category_id_to_name_dict = category_id_to_name_dict # Local dataset mapping. 
 
   def write(self, image_write_abs_path, annotation_write_abs_path, category_name_to_id_dict, *, overwrite=False) -> bool:
     if not overwrite and (os.path.exists(image_write_abs_path) or os.path.exists(annotation_write_abs_path)):
@@ -21,7 +19,29 @@ class Image:
     Annotation.write_annotation_list(annotation_write_abs_path, self.annotation_list, category_name_to_id_dict, overwrite=overwrite) # Global dataset mapping. 
     return True
   
+  @property
+  def image_basename(self) -> str:
+    return os.path.basename(self.image_path)
+
+  @property
+  def label_basename(self) -> str:
+    return os.path.basename(self.label_path)
+
+  
+  
+  @property
+  def image_path(self) -> str:
+    return self._image_abs_path
+
+  @property 
+  def label_path(self) -> str:
+    return _convert_image_path_to_label_path(self.image_path)
+
+  @property
+  def annotation_list(self) -> list[Annotation]:
+    return Annotation.from_path(self.label_path, self._category_id_to_name_dict)  
+  
   def _write_image(self, image_write_abs_path):
     os.makedirs(os.path.dirname(image_write_abs_path), exist_ok=True)
-    copyfile(self._image_abs_path, image_write_abs_path)
+    copyfile(self.image_path, image_write_abs_path)
   
