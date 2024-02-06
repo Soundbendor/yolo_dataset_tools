@@ -47,8 +47,7 @@ class Annotation:
     # Converting write_path to absolute path. 
     write_path = os.path.abspath(write_path)
     if not os.path.exists(write_path) or overwrite:
-      if not os.path.exists(os.path.dirname(write_path)):
-        os.makedirs(os.path.dirname(write_path))
+      os.makedirs(os.path.dirname(write_path), exist_ok=True)
       with open(write_path, "w") as f:
         f.write("\n".join(annotation.as_str(name_to_id_dict) for annotation in annotation_list))
       return True
