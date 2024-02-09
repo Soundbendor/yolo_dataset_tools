@@ -1,6 +1,7 @@
 
 from .dataset import Dataset 
-import bidict, json, os 
+import json, os 
+from bidict import bidict 
 from typing import Iterable 
 
 """

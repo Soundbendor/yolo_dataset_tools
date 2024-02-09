@@ -19,6 +19,7 @@
 | Function/class | Description | 
 | --- | --- | 
 | `get_category_list_from_file` | Parse list of category names from file. | 
+| `write_partition_segmentation_images_to_yolo` | Combines `write_coco_json_from_segmentation_path`, `write_image_annotations_to_folder`, and creation of partition folder. |
 | `write_coco_json_from_segmentation_path` | Converts segmentation image masks to segmentation lists, storing them in COCO JSON format. 
 | `write_image_annotations_to_folder` | COCO JSON => YOLO segmentation format. 
 | `DatasetMerger` | Merge datasets. 

@@ -4,7 +4,13 @@ from .get_category_list_from_file import get_category_list_from_file
 from pprint import pprint 
 from tqdm import tqdm 
 
-def write_coco_json_from_segmentation_path(image_orig_dir_path: str, image_mask_dir_path: str, json_write_path: str, category_id_map: dict | list, limit: int | None=None, verbose: bool=False, *, ask_overwrite=True, print_progress="tqdm", multipolygon_ids=None):
+def write_coco_json_from_segmentation_path(
+  image_orig_dir_path: str, 
+  image_mask_dir_path: str, 
+  json_write_path: str, 
+  category_id_map: dict | list, 
+  limit: int | None=None, 
+  verbose: bool=False, *, ask_overwrite=True, print_progress="tqdm", multipolygon_ids=None):
   """
   image_orig_dir_path : Path to directory of original images. 
   image_mask_dir_path : Path to directory of segmentation mask images. 

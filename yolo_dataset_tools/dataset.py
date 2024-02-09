@@ -1,6 +1,8 @@
 
 import yaml, bidict, os, glob 
 from collections import defaultdict 
+from typing import Iterable 
+from .image import Image 
 
 class Dataset:
   def __init__(self, name, yaml_path):
