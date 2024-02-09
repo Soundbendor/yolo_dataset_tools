@@ -4,7 +4,7 @@ from .get_category_list_from_file import get_category_list_from_file
 from pprint import pprint 
 from tqdm import tqdm 
 
-def write_coco_json_from_segmentation_path(image_orig_dir_path: str, image_mask_dir_path: str, json_write_path: str, category_id_map: dict | list, limit: int | None=None, verbose: bool=False, *, ask_overwrite=True, print_progress="tqdm"):
+def write_coco_json_from_segmentation_path(image_orig_dir_path: str, image_mask_dir_path: str, json_write_path: str, category_id_map: dict | list, limit: int | None=None, verbose: bool=False, *, ask_overwrite=True, print_progress="tqdm", multipolygon_ids=None):
   """
   image_orig_dir_path : Path to directory of original images. 
   image_mask_dir_path : Path to directory of segmentation mask images. 
@@ -44,7 +44,7 @@ def write_coco_json_from_segmentation_path(image_orig_dir_path: str, image_mask_
 
   coco_format["categories"] = create_category_annotation(category_id_map)
   
-  coco_format["images"], coco_format["annotations"], annotation_cnt = images_annotations_info(image_mask_dir_path, category_colors, limit=limit, print_progress=print_progress)
+  coco_format["images"], coco_format["annotations"], annotation_cnt = images_annotations_info(image_mask_dir_path, category_colors, limit=limit, print_progress=print_progress, multipolygon_ids=multipolygon_ids)
   
   if verbose:
     pprint(f"json dumps: {json.dumps(coco_format)}", indent=2)
