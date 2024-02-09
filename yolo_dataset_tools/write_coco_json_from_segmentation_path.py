@@ -84,6 +84,8 @@ def _get_confirmation_from_user_about_overwrite(json_write_path) -> bool:
               return True 
           else:
               print("Invalid input. Please enter y/n.")
+  else:
+    return True
 
 # SOURCE: https://github.com/chrise96/image-to-coco-json-converter/blob/master/create-custom-coco-dataset.ipynb 
 
@@ -96,9 +98,20 @@ from shapely.geometry import Polygon, MultiPolygon         # (pip install Shapel
 import os
 import json
 
-def create_sub_masks(mask_image, width, height):
+def create_sub_masks(mask_image, colors):
     # Initialize a dictionary of sub-masks indexed by RGB colors
     sub_masks = {}
+    for color_str in colors:
+        # convert color_str to color
+        color = tuple(map(int, color_str[1:-1].split(',')))
+
+        # get color mask from color
+        im_ary = np.array(mask_image)
+        color_mask = np.logical_and(*[im_ary[:, :, i] == color[i] for i in range(3)])
+
+        sub_masks[color_str] = np.pad(color_mask, 1)
+    
+    """
     for x in range(width):
         for y in range(height):
             # Get the RGB values of the pixel
@@ -116,6 +129,7 @@ def create_sub_masks(mask_image, width, height):
 
             # Set the pixel value to 1 (default is 0), accounting for padding
             sub_masks[pixel_str].putpixel((x+1, y+1), 1)
+    """
 
     return sub_masks
 
@@ -142,10 +156,15 @@ def create_sub_mask_annotation(sub_mask):
             # Go to next iteration, dont save empty values in list
             continue
 
-        polygons.append(poly)
-
-        segmentation = np.array(poly.exterior.coords).ravel().tolist()
-        segmentations.append(segmentation)
+        if poly.type == 'MultiPolygon':
+            for p in poly:
+                polygons.append(p)
+                segmentation = np.array(p.exterior.coords).ravel().tolist()
+                segmentations.append(segmentation)
+        else:
+            polygons.append(poly)
+            segmentation = np.array(poly.exterior.coords).ravel().tolist()
+            segmentations.append(segmentation)
     
     return polygons, segmentations
 
@@ -236,10 +255,11 @@ import glob
 # }
 
 # Define the ids that are a multiplolygon. In our case: wall, roof and sky
-multipolygon_ids = [2, 5, 6]
+# multipolygon_ids = [2, 5, 6]
 
 # Get "images" and "annotations" info 
-def images_annotations_info(maskpath, category_colors, limit=None, print_progress="tqdm"):
+def images_annotations_info(maskpath, category_colors, limit=None, print_progress="tqdm", multipolygon_ids=None):
+    multipolygon_ids = multipolygon_ids or []
     # This id will be automatically increased as we go
     annotation_id = 0
     image_id = 0
@@ -257,7 +277,7 @@ def images_annotations_info(maskpath, category_colors, limit=None, print_progres
         if print_progress == "tqdm":
           files_to_iter.set_description(f"Creating annotations for {mask_image}.")
         elif print_progress == "print":
-          print(f"[{i}/{len(files_to_iter)} Creating annotations for {mask_image}.")
+          print(f"[{i}/{len(files_to_iter)}] Creating annotations for {mask_image}.")
         # The mask image is *.png but the original image is *.jpg.
         # We make a reference to the original file in the COCO JSON file
         original_file_name = os.path.basename(mask_image).split(".")[0] + ".jpg"
@@ -270,7 +290,7 @@ def images_annotations_info(maskpath, category_colors, limit=None, print_progres
         image = create_image_annotation(original_file_name, w, h, image_id)
         images.append(image)
 
-        sub_masks = create_sub_masks(mask_image_open, w, h)
+        sub_masks = create_sub_masks(mask_image_open, category_colors.keys())
         for color, sub_mask in sub_masks.items():
             category_id = category_colors[color]
 

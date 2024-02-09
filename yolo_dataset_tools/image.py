@@ -8,6 +8,10 @@ def _convert_image_path_to_label_path(image_path) -> str:
 
 class Image:
   def __init__(self, image_abs_path, category_id_to_name_dict):
+    """
+    Assumes corresponding label follows YOLO format-- replaces "images" 
+    in image_abs_path with "labels" and uses ".txt" file ending to find label path. 
+    """
     self._image_abs_path = image_abs_path
     self._category_id_to_name_dict = category_id_to_name_dict # Local dataset mapping. 
 
