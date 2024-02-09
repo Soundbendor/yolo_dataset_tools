@@ -162,8 +162,8 @@ def create_sub_mask_annotation(sub_mask):
             # Go to next iteration, dont save empty values in list
             continue
 
-        if poly.type == 'MultiPolygon':
-            for p in poly:
+        if poly.geom_type == 'MultiPolygon':
+            for p in poly.geoms:
                 polygons.append(p)
                 segmentation = np.array(p.exterior.coords).ravel().tolist()
                 segmentations.append(segmentation)
