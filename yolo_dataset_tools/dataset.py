@@ -26,7 +26,7 @@ class Dataset:
       partitions = [partition]
 
     for partition in partitions:
-      if partition in self.yaml_dict:
+      if self.yaml_dict.get(partition, None) is not None:
         self._write_partition(write_folder, global_category_name_to_id_dict, partition, overwrite=overwrite)
 
   def freqs(self, partition="all") -> dict:
@@ -39,8 +39,11 @@ class Dataset:
     dct = defaultdict(int)
     for partition in partition_list:
       for image in self.images(partition):
-        for annotation in image.annotation_list:
-          dct[annotation.category] += 1
+        try:
+          for annotation in image.annotation_list:
+            dct[annotation.category] += 1
+        except:
+          continue
     return dct
         
   def _write_partition(self, write_folder, global_category_name_to_id_dict, partition, *, overwrite=False) -> bool:
@@ -55,8 +58,12 @@ class Dataset:
   
   def images(self, partition) -> Iterable[Image]:
     """ Raises exception if partition not in yaml. """
-    for image_path in glob.glob(os.path.join(os.path.dirname(self.yaml_path), self.yaml_dict["path"], self.yaml_dict[partition], "*.jpg")):
-      yield Image(image_path, self.category_id_to_name_dict)
+    yaml_dir    = os.path.dirname(self.yaml_path)
+    images_path = self.yaml_dict["path"]
+    part_path   = self.yaml_dict[partition]
+    if self.yaml_dict.get(partition, None) is not None: 
+      for image_path in glob.glob(os.path.normpath(os.path.join(yaml_dir, images_path, part_path, "*.jpg"))):
+        yield Image(image_path, self.category_id_to_name_dict)
     
   @property
   def name(self) -> str:

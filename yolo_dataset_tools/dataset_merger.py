@@ -82,7 +82,8 @@ class DatasetMerger:
     return dct
     
   @property
-  def datasets(self) -> Iterable[Dataset]:
+  def __iter__(self) -> Iterable[Dataset]:
+    """ Returns iterable of Datasets. """
     for (name, yaml_path) in self.datasets.items():
       yield Dataset(name, yaml_path)
       

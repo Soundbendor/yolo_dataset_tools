@@ -4,7 +4,8 @@ from .annotation import Annotation
 from shutil import copyfile
 
 def _convert_image_path_to_label_path(image_path) -> str:
-  return "labels".join(image_path.rsplit("images", 1)) # Replaces last instance of "images" in path with "labels".
+  image_path = "labels".join(image_path.rsplit("images", 1)) # Replaces last instance of "images" in path with "labels".
+  return ".".join(image_path.split(".")[:-1]) + ".txt"
 
 class Image:
   def __init__(self, image_abs_path, category_id_to_name_dict):
