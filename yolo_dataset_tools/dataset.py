@@ -1,5 +1,6 @@
 
-import yaml, bidict, os, glob 
+import yaml, os, glob 
+from bidict import bidict 
 from collections import defaultdict 
 from typing import Iterable 
 from .image import Image 
@@ -51,7 +52,7 @@ class Dataset:
         global_category_name_to_id_dict, 
         overwrite=overwrite,
       )
-        
+  
   def images(self, partition) -> Iterable[Image]:
     """ Raises exception if partition not in yaml. """
     for image_path in glob.glob(os.path.join(os.path.dirname(self.yaml_path), self.yaml_dict["path"], self.yaml_dict[partition], "*.jpg")):
