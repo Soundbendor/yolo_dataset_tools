@@ -60,8 +60,8 @@ class Dataset:
     """ Raises exception if partition not in yaml. """
     yaml_dir    = os.path.dirname(self.yaml_path)
     images_path = self.yaml_dict["path"]
-    part_path   = self.yaml_dict[partition]
     if self.yaml_dict.get(partition, None) is not None: 
+      part_path   = self.yaml_dict[partition]
       for image_path in glob.glob(os.path.normpath(os.path.join(yaml_dir, images_path, part_path, "*.jpg"))):
         yield Image(image_path, self.category_id_to_name_dict)
     
