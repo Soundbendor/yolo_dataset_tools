@@ -11,7 +11,8 @@ def write_partition_segmentation_images_to_yolo(
   partition: str, # Subfolder in YOLO folder to write to. "train" | "val" | "test" 
   category_id_map: dict | list, # ID-to-name map 
   limit: int | None=None, # Limit on number of .pngs to go through. If None, does all. 
-  verbose: bool=False, *, ask_overwrite=True, print_progress="tqdm", multipolygon_ids=None):
+  verbose: bool=False, *, ask_overwrite=True, print_progress="tqdm", multipolygon_ids=None,
+  category_color_scheme="rgb"):
   """ End-to-end writes YOLO file structure from segmentation image (i.e., not segmentation text file) directory. """
   
   if partition not in ["train", "test", "val"]:
@@ -26,7 +27,8 @@ def write_partition_segmentation_images_to_yolo(
     verbose, 
     ask_overwrite=ask_overwrite, 
     print_progress=print_progress, 
-    multipolygon_ids=multipolygon_ids
+    multipolygon_ids=multipolygon_ids,
+    category_color_scheme=category_color_scheme,
     )
   
   with open(json_write_path, "r") as f:

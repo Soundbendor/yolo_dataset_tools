@@ -10,7 +10,8 @@ def write_coco_json_from_segmentation_path(
   json_write_path: str, 
   category_id_map: dict | list, 
   limit: int | None=None, 
-  verbose: bool=False, *, ask_overwrite=True, print_progress="tqdm", multipolygon_ids=None):
+  verbose: bool=False, *, ask_overwrite=True, print_progress="tqdm", multipolygon_ids=None,
+  category_color_scheme="rgb"):
   """
   image_orig_dir_path : Path to directory of original images. 
   image_mask_dir_path : Path to directory of segmentation mask images. 
@@ -43,7 +44,7 @@ def write_coco_json_from_segmentation_path(
     category_id_map = bidict({ category_name : i for i, category_name in enumerate(category_id_map) })
     
   # Get the colors for the category names. 
-  category_colors = { _id_to_color_str(category_id): category_id for (category_name, category_id) in category_id_map.items() }
+  category_colors = { _id_to_color_str(category_id, category_color_scheme): category_id for (category_name, category_id) in category_id_map.items() }
 
   # Getting empty COCO json. 
   coco_format = get_coco_json_format()
@@ -58,8 +59,11 @@ def write_coco_json_from_segmentation_path(
   with open(json_write_path, "w") as outfile:
     json.dump(coco_format, outfile, indent=2)
 
-def _id_to_color_str(id: int) -> str:
-  return f"({id}, {id}, {id})"
+def _id_to_color_str(id: int, scheme: str) -> str:
+  if scheme == "rgb":
+    return f"({id}, {id}, {id})"
+  elif scheme == "r":
+    return f"({id}, 0, 0)"
 
 def main():
   FOOD_SEG_103_TEST_ORIG_IMAGES_PATH  = "/home/joey/food-waste-model-training/datasets/datasets/Food_Seg_103/FoodSeg103/Test/images/"

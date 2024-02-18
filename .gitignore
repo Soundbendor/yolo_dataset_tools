@@ -3,3 +3,4 @@
 test_folder_write
 *.egg-info*
 *.txt
+*.csv
