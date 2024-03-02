@@ -41,8 +41,8 @@ if __name__ == "__main__":
     os.path.join(DATASETS_PATH, "Food_Seg_103", "FoodSeg103", "category_id.txt"),
     os.path.join(DATASETS_PATH, "UEC_Foodpix_Complete", "UECFOODPIXCOMPLETE", "data", "category.txt")
   ]
-  lst1 = get_categories(PATHS[0])
-  lst2 = get_categories(PATHS[1], 1)
+  lst1 = get_category_list_from_file(PATHS[0], 0)
+  lst2 = get_category_list_from_file(PATHS[1], 1)
   # Finding categories that BOTH datasets share. 
   set1 = set(lst1)
   set2 = set(lst2)

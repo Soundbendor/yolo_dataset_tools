@@ -4,3 +4,5 @@ test_folder_write
 *.egg-info*
 *.txt
 *.csv
+yolo_dataset_tools/write_freqs_to_csv.py
+neptune_hook.py

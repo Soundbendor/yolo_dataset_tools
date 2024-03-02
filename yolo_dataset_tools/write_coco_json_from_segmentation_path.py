@@ -1,6 +1,7 @@
 
 from bidict import bidict 
 from .get_category_list_from_file import get_category_list_from_file 
+from .remove_background import remove_background as remove_background_
 from pprint import pprint 
 from tqdm import tqdm 
 
@@ -11,7 +12,7 @@ def write_coco_json_from_segmentation_path(
   category_id_map: dict | list, 
   limit: int | None=None, 
   verbose: bool=False, *, ask_overwrite=True, print_progress="tqdm", multipolygon_ids=None,
-  category_color_scheme="rgb"):
+  category_color_scheme="rgb", remove_background=True):
   """
   image_orig_dir_path : Path to directory of original images. 
   image_mask_dir_path : Path to directory of segmentation mask images. 
@@ -52,10 +53,13 @@ def write_coco_json_from_segmentation_path(
   coco_format["categories"] = create_category_annotation(category_id_map)
   
   coco_format["images"], coco_format["annotations"], annotation_cnt = images_annotations_info(image_mask_dir_path, category_colors, limit=limit, print_progress=print_progress, multipolygon_ids=multipolygon_ids)
+
+  if remove_background:
+    coco_format = remove_background_(coco_format)
   
   if verbose:
     pprint(f"json dumps: {json.dumps(coco_format)}", indent=2)
-  
+    
   with open(json_write_path, "w") as outfile:
     json.dump(coco_format, outfile, indent=2)
 

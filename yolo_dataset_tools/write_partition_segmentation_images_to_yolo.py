@@ -33,6 +33,6 @@ def write_partition_segmentation_images_to_yolo(
   
   with open(json_write_path, "r") as f:
     coco_dict = json.load(f)
-  write_image_annotations_to_folder(os.path.join(yolo_folder_path, "labels", partition), coco_dict)
+  write_image_annotations_to_folder(os.path.join(yolo_folder_path, "labels", partition), coco_dict, ask_overwrite=ask_overwrite)
   if os.path.exists(image_orig_dir_path) and not os.path.exists(os.path.join(yolo_folder_path, "images", partition)):
     shutil.copytree(image_orig_dir_path, os.path.join(yolo_folder_path, "images", partition))

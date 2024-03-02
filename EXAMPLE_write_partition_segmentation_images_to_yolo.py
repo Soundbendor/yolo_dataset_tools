@@ -9,8 +9,8 @@ if __name__ == "__main__":
   FOOD_SEG_103_CATEGORY_ID_MAP        = get_category_list_from_file("/home/joey/food-waste-model-training/datasets/datasets/Food_Seg_103/FoodSeg103/category_id.txt", start_line=0)
   FOOD_SEG_103_PARTITION              = "test"
   LIMIT                               = None 
-  ASK_OVERWRITE                       = True 
-  PRINT_PROGRESS                      = "print" 
+  ASK_OVERWRITE                       = False
+  PRINT_PROGRESS                      = "print"
   write_partition_segmentation_images_to_yolo(
     FOOD_SEG_103_TEST_ORIG_IMAGES_PATH,
     FOOD_SEG_103_TEST_LABEL_IMAGES_PATH,

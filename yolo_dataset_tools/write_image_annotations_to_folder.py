@@ -153,8 +153,9 @@ from bidict import bidict
 from collections import defaultdict 
 import os 
 
-def write_image_annotations_to_folder(folder_path, coco_dict):
-  _get_confirmation_from_user_about_overwrite(folder_path)
+def write_image_annotations_to_folder(folder_path, coco_dict, *, ask_overwrite=True):
+  if ask_overwrite:
+    _get_confirmation_from_user_about_overwrite(folder_path)
   image_id_to_file_name_map = get_image_id_to_file_name_map(coco_dict)
   image_id_to_height_width_map = get_image_id_to_height_width_map(coco_dict)
   annotations = coco_dict["annotations"]
